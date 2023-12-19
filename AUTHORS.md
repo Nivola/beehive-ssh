@@ -1,5 +1,10 @@
-beehive-ssh is written and maintained by: 
+beehive-ssh is written and maintained by:
 
-* Sergio Tonani
-* Gianni Doria
+
+* Antonio Brasile
+* Davide Sacchetto
+* Fabrizio Cosci
 * Filippo Vallero
+* Gianni Doria
+* Pietro Pilolli
+* Sergio Tonani

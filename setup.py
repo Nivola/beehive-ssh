@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2022 CSI-Piemonte
+# (C) Copyright 2018-2023 CSI-Piemonte
 
 from sys import version_info
 from setuptools import setup
@@ -24,58 +24,55 @@ class install(_install):
 
 
 def load_requires():
-    with open('./MANIFEST.md') as f:
+    with open("./MANIFEST.md") as f:
         requires = f.read()
     return requires
 
 
 def load_version():
-    with open('./beehive_ssh/VERSION') as f:
+    with open("./beehive_ssh/VERSION") as f:
         version = f.read()
     return version
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     version = load_version()
     setup(
-        name='beehive_ssh',
+        name="beehive_ssh",
         version=version,
-        description='Nivola server connection manager package',
-        long_description='Nivola server connection manager package',
-        author='CSI Piemonte',
-        author_email='nivola.engineering@csi.it',
-        license='EUPL-1.2',
-        url='',
+        description="Nivola server connection manager package",
+        long_description="Nivola server connection manager package",
+        author="CSI Piemonte",
+        author_email="nivola.engineering@csi.it",
+        license="EUPL-1.2",
+        url="",
         scripts=[],
         packages=[
-            'beehive_ssh',
-            'beehive_ssh.dao',
-            'beehive_ssh.tests',
-            'beehive_ssh.views'
+            "beehive_ssh",
+            "beehive_ssh.dao",
+            "beehive_ssh.tests",
+            "beehive_ssh.views",
         ],
         namespace_packages=[],
         py_modules=[
-            'beehive_ssh.controller',
-            'beehive_ssh.event',
-            'beehive_ssh.__init__',
-            'beehive_ssh.model',
-            'beehive_ssh.mod'
+            "beehive_ssh.controller",
+            "beehive_ssh.event",
+            "beehive_ssh.__init__",
+            "beehive_ssh.model",
+            "beehive_ssh.mod",
         ],
         classifiers=[
-            'Development Status :: %s' % version,
-            'Programming Language :: Python'
+            "Development Status :: %s" % version,
+            "Programming Language :: Python",
         ],
         entry_points={},
-        data_files=[
-        ],
-        package_data={
-            'beehive_ssh': ['VERSION']
-        },
+        data_files=[],
+        package_data={"beehive_ssh": ["VERSION"]},
         install_requires=load_requires(),
         dependency_links=[],
         zip_safe=True,
-        cmdclass={'install': install},
-        keywords='',
-        python_requires='',
-        obsoletes=[]
+        cmdclass={"install": install},
+        keywords="",
+        python_requires="",
+        obsoletes=[],
     )
