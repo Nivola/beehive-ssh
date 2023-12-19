@@ -1,5 +1,5 @@
 # beehive-ssh
-__beehive-ssh__ is the project that contains the ssh component of the Nivola CMP platform. 
+__beehive-ssh__ is the project that contains the ssh component of the nivola cmp platform. 
 
 Ssh component is used to manage virtual machine access and connection.
 

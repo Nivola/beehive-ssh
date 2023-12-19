@@ -1,5 +1,28 @@
 # Changelog
 
+## Version 1.15.0
+
+* Fixed ...
+  * minor fixes
+
+## Version 1.14.0
+
+* Fixed ...
+  * minor fixes
+
+## Version 1.13.0
+
+* Fixed ...
+  * minor fixes
+
+## Version 1.12.0
+
+* Added ...
+  * elasticsearch upgrade
+* Fixed ...
+  * validation methods response
+
+
 ## Version 1.11.0 (oct 11, 2022)
 * Various bugfixes
 
@@ -10,7 +33,7 @@
 * Integrated ...
 * Various bugfixes
     * correct bug in ssh user get. Some fields are not valorized
-    * correct bug in list ssh user by node. Read param node in place of node_id 
+    * correct bug in list ssh user by node. Read param node in place of node_id
     * correct bug in node user auth. User assigned is wrong because user filter by node pass a wrong parameter
 
 ## Version 1.5.0 (Jun 11, 2021)

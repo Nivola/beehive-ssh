@@ -1,18 +1,30 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2022 CSI-Piemonte
+# (C) Copyright 2018-2023 CSI-Piemonte
 
-from beehive.common.apimanager import ApiView, PaginatedRequestQuerySchema, PaginatedResponseSchema, \
-    ApiObjectResponseSchema, CrudApiObjectResponseSchema, GetApiObjectRequestSchema, \
-    ApiObjectPermsResponseSchema, ApiObjectPermsRequestSchema, ApiObjectRequestFiltersSchema
+from beehive.common.apimanager import (
+    ApiView,
+    PaginatedRequestQuerySchema,
+    PaginatedResponseSchema,
+    ApiObjectResponseSchema,
+    CrudApiObjectResponseSchema,
+    GetApiObjectRequestSchema,
+    ApiObjectPermsResponseSchema,
+    ApiObjectPermsRequestSchema,
+    ApiObjectRequestFiltersSchema,
+)
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
-from beehive_ssh.views import SshApiView, ApiBaseSshObjectCreateRequestSchema, ApiBaseSshObjectUpdateRequestSchema
+from beehive_ssh.views import (
+    SshApiView,
+    ApiBaseSshObjectCreateRequestSchema,
+    ApiBaseSshObjectUpdateRequestSchema,
+)
 
 
 class ListSshUsersRequestSchema(ApiObjectRequestFiltersSchema, PaginatedRequestQuerySchema):
-    node_id = fields.String(required=False, context='query')
-    username = fields.String(required=False, context='query')
+    node_id = fields.String(required=False, context="query")
+    username = fields.String(required=False, context="query")
 
 
 class ListSshUsersParamsResponseSchema(ApiObjectResponseSchema):
@@ -25,18 +37,13 @@ class ListSshUsersResponseSchema(PaginatedResponseSchema):
 
 
 class ListSshUsers(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'ListSshUsersResponseSchema': ListSshUsersResponseSchema,
+        "ListSshUsersResponseSchema": ListSshUsersResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(ListSshUsersRequestSchema)
     parameters_schema = ListSshUsersRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': ListSshUsersResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": ListSshUsersResponseSchema}})
 
     def get(self, controller, data, *args, **kwargs):
         """
@@ -45,7 +52,7 @@ class ListSshUsers(SshApiView):
         """
         users, total = controller.get_ssh_users(**data)
         res = [r.info() for r in users]
-        return self.format_paginated_response(res, 'users', total, **data)
+        return self.format_paginated_response(res, "users", total, **data)
 
 
 class GetSshUserParamsResponseSchema(ApiObjectResponseSchema):
@@ -58,67 +65,52 @@ class GetSshUserResponseSchema(Schema):
 
 
 class GetSshUser(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'GetSshUserResponseSchema': GetSshUserResponseSchema,
+        "GetSshUserResponseSchema": GetSshUserResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': GetSshUserResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": GetSshUserResponseSchema}})
 
     def get(self, controller, data, oid, *args, **kwargs):
         user = controller.get_ssh_user(oid)
-        return {'user': user.detail()}
+        return {"user": user.detail()}
 
 
 class GetSshUserPerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'ApiObjectPermsRequestSchema': ApiObjectPermsRequestSchema,
-        'ApiObjectPermsResponseSchema': ApiObjectPermsResponseSchema,
+        "ApiObjectPermsRequestSchema": ApiObjectPermsRequestSchema,
+        "ApiObjectPermsResponseSchema": ApiObjectPermsResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(ApiObjectPermsRequestSchema)
     parameters_schema = PaginatedRequestQuerySchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': ApiObjectPermsResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
     def get(self, controller, data, oid, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         res, total = user.authorization(**data)
-        return self.format_paginated_response(res, 'perms', total, **data)
+        return self.format_paginated_response(res, "perms", total, **data)
 
 
 class ApiObjectPermsResponseSchema(Schema):
-    password = fields.String(required=True, default='mypass', example='mypass', description='USer password')
+    password = fields.String(required=True, default="mypass", example="mypass", description="USer password")
 
 
 class GetSshUserPwd(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'GetApiObjectRequestSchema': GetApiObjectRequestSchema,
-        'ApiObjectPermsResponseSchema': ApiObjectPermsResponseSchema,
+        "GetApiObjectRequestSchema": GetApiObjectRequestSchema,
+        "ApiObjectPermsResponseSchema": ApiObjectPermsResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     parameters_schema = GetApiObjectRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': ApiObjectPermsResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
     def get(self, controller, data, oid, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         res = user.get_password()
-        return {'password': res}
+        return {"password": res}
 
 
 class CreateSshUserParamRequestSchema(ApiBaseSshObjectCreateRequestSchema):
@@ -130,33 +122,29 @@ class CreateSshUserParamRequestSchema(ApiBaseSshObjectCreateRequestSchema):
 
 
 class CreateSshUserRequestSchema(Schema):
-    user = fields.Nested(CreateSshUserParamRequestSchema, context='body')
+    user = fields.Nested(CreateSshUserParamRequestSchema, context="body")
 
 
 class CreateSshUserBodyRequestSchema(Schema):
-    body = fields.Nested(CreateSshUserRequestSchema, context='body')
+    body = fields.Nested(CreateSshUserRequestSchema, context="body")
 
 
 class CreateSshUser(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'CreateSshUserRequestSchema': CreateSshUserRequestSchema,
-        'CrudApiObjectResponseSchema':CrudApiObjectResponseSchema
+        "CreateSshUserRequestSchema": CreateSshUserRequestSchema,
+        "CrudApiObjectResponseSchema": CrudApiObjectResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(CreateSshUserBodyRequestSchema)
     parameters_schema = CreateSshUserRequestSchema
-    responses = SshApiView.setResponses({
-        201: {
-            'description': 'success',
-            'schema': CrudApiObjectResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({201: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
     def post(self, controller, data, *args, **kwargs):
         from beehive_ssh.controller import SshController
+
         sshController: SshController = controller
-        resp = sshController.add_ssh_user(**data.get('user'))
-        return {'uuid':resp}, 201
+        resp = sshController.add_ssh_user(**data.get("user"))
+        return {"uuid": resp}, 201
 
 
 class UpdateSshUserParamRequestSchema(ApiBaseSshObjectUpdateRequestSchema):
@@ -172,42 +160,33 @@ class UpdateSshUserRequestSchema(Schema):
 
 
 class UpdateSshUserBodyRequestSchema(GetApiObjectRequestSchema):
-    body = fields.Nested(UpdateSshUserRequestSchema, context='body')
+    body = fields.Nested(UpdateSshUserRequestSchema, context="body")
 
 
 class UpdateSshUser(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'UpdateSshUserRequestSchema': UpdateSshUserRequestSchema,
-        'CrudApiObjectResponseSchema': CrudApiObjectResponseSchema
+        "UpdateSshUserRequestSchema": UpdateSshUserRequestSchema,
+        "CrudApiObjectResponseSchema": CrudApiObjectResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(UpdateSshUserBodyRequestSchema)
     parameters_schema = UpdateSshUserRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': CrudApiObjectResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
     def put(self, controller, data, oid, *args, **kwargs):
         user = controller.get_ssh_user(oid)
-        data = data.get('user')
+        data = data.get("user")
         self.logger.warn(data)
         self.logger.warn(user.name)
         resp = user.update(**data)
-        return {'uuid':resp}, 200
+        return {"uuid": resp}, 200
 
 
 class DeleteSshUser(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {}
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
-    responses = SshApiView.setResponses({
-        204: {
-            'description': 'no response'
-        }
-    })
+    responses = SshApiView.setResponses({204: {"description": "no response"}})
 
     def delete(self, controller, data, oid, *args, **kwargs):
         user = controller.get_ssh_user(oid)
@@ -217,19 +196,19 @@ class DeleteSshUser(SshApiView):
 
 
 class SshUserAPI(ApiView):
-    """SshUserAPI
-    """
+    """SshUserAPI"""
+
     @staticmethod
     def register_api(module, **kwargs):
-        base = 'gas'
+        base = "gas"
         rules = [
-            ('%s/users' % base, 'GET', ListSshUsers, {}),
-            ('%s/users/<oid>' % base, 'GET', GetSshUser, {}),
-            ('%s/users/<oid>/perms' % base, 'GET', GetSshUserPerms, {}),
-            ('%s/users/<oid>/password' % base, 'GET', GetSshUserPwd, {}),
-            ('%s/users' % base, 'POST', CreateSshUser, {}),
-            ('%s/users/<oid>' % base, 'PUT', UpdateSshUser, {}),
-            ('%s/users/<oid>' % base, 'DELETE', DeleteSshUser, {}),
+            ("%s/users" % base, "GET", ListSshUsers, {}),
+            ("%s/users/<oid>" % base, "GET", GetSshUser, {}),
+            ("%s/users/<oid>/perms" % base, "GET", GetSshUserPerms, {}),
+            ("%s/users/<oid>/password" % base, "GET", GetSshUserPwd, {}),
+            ("%s/users" % base, "POST", CreateSshUser, {}),
+            ("%s/users/<oid>" % base, "PUT", UpdateSshUser, {}),
+            ("%s/users/<oid>" % base, "DELETE", DeleteSshUser, {}),
         ]
 
         ApiView.register_api(module, rules, **kwargs)

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2022 CSI-Piemonte
+# (C) Copyright 2018-2023 CSI-Piemonte
 
 from beehive.module.basic.views.status import StatusAPI
 from beehive.common.apimanager import ApiModule
@@ -15,18 +15,18 @@ from beehive_ssh.views.ssh_key import SshKeyAPI
 
 class SshModule(ApiModule):
     def __init__(self, api_manager):
-        self.name = 'SshModule'
-        self.base_path = 'gas'
-    
+        self.name = "SshModule"
+        self.base_path = "gas"
+
         ApiModule.__init__(self, api_manager, self.name)
-    
+
         self.apis = [
             StatusAPI,
             SshGroupAPI,
             SshNodeAPI,
             SshUserAPI,
             SshKeyAPI,
-            SshAnsibleAPI
+            SshAnsibleAPI,
         ]
         self.api_plugins = {}
         self.controller = SshController(self)
@@ -38,4 +38,4 @@ class SshModule(ApiModule):
         self.apis.extend(apis)
         # self.api_plugins
         for api in self.apis:
-            self.logger.debug('Set apis: %s' % get_class_name(api))
+            self.logger.debug("Set apis: %s" % get_class_name(api))

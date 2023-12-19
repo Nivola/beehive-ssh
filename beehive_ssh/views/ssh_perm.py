@@ -1,9 +1,13 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2022 CSI-Piemonte
+# (C) Copyright 2018-2023 CSI-Piemonte
 
-from beehive.common.apimanager import ApiView, ApiObjectResponseSchema,  GetApiObjectRequestSchema, \
-    CrudApiObjectSimpleResponseSchema
+from beehive.common.apimanager import (
+    ApiView,
+    ApiObjectResponseSchema,
+    GetApiObjectRequestSchema,
+    CrudApiObjectSimpleResponseSchema,
+)
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
 from beehive_ssh.views import SshApiView
@@ -17,25 +21,20 @@ class GetUserPermsResponseSchema(ApiObjectResponseSchema):
 
 
 class GetUserPermsResponseSchema(Schema):
-    perms = fields.Dict() # fields.Nested(GetSshLoginParamsResponseSchema, required=True, allow_none=True)
+    perms = fields.Dict()  # fields.Nested(GetSshLoginParamsResponseSchema, required=True, allow_none=True)
 
 
 class GetUserPerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'GetUserPermsResponseSchema': GetUserPermsResponseSchema,
+        "GetUserPermsResponseSchema": GetUserPermsResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': GetUserPermsResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": GetUserPermsResponseSchema}})
 
     def get(self, controller, data, oid, *args, **kwargs):
         perms = controller.get_user_perms(oid)
-        return {'perms': perms}
+        return {"perms": perms}
 
 
 class SetUserPermRequestSchema(Schema):
@@ -48,27 +47,22 @@ class SetUserPermsRequestSchema(Schema):
 
 
 class SetUserPermsBodyRequestSchema(GetApiObjectRequestSchema):
-    body = fields.Nested(SetUserPermsRequestSchema, context='body')
+    body = fields.Nested(SetUserPermsRequestSchema, context="body")
 
 
 class SetUserPerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'SetUserPermsRequestSchema': SetUserPermsRequestSchema,
-        'CrudApiObjectSimpleResponseSchema': CrudApiObjectSimpleResponseSchema
+        "SetUserPermsRequestSchema": SetUserPermsRequestSchema,
+        "CrudApiObjectSimpleResponseSchema": CrudApiObjectSimpleResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(SetUserPermsBodyRequestSchema)
     parameters_schema = SetUserPermsRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': CrudApiObjectSimpleResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
     def post(self, controller, data, oid, *args, **kwargs):
-        resp = controller.assign_user_perms(oid, data.get('perms'))
-        return {'uuid': resp}, 200
+        resp = controller.assign_user_perms(oid, data.get("perms"))
+        return {"uuid": resp}, 200
 
 
 class UnSetUserPermRequestSchema(Schema):
@@ -81,27 +75,22 @@ class UnSetUserPermsRequestSchema(Schema):
 
 
 class UnSetUserPermsBodyRequestSchema(GetApiObjectRequestSchema):
-    body = fields.Nested(UnSetUserPermsRequestSchema, context='body')
+    body = fields.Nested(UnSetUserPermsRequestSchema, context="body")
 
 
 class UnSetUserPerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'UnSetUserPermsRequestSchema': UnSetUserPermsRequestSchema,
-        'CrudApiObjectSimpleResponseSchema': CrudApiObjectSimpleResponseSchema
+        "UnSetUserPermsRequestSchema": UnSetUserPermsRequestSchema,
+        "CrudApiObjectSimpleResponseSchema": CrudApiObjectSimpleResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(UnSetUserPermsBodyRequestSchema)
     parameters_schema = UnSetUserPermsRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': CrudApiObjectSimpleResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
     def delete(self, controller, data, oid, *args, **kwargs):
-        resp = controller.deassign_user_perms(oid, data.get('perms'))
-        return {'uuid': resp}, 200
+        resp = controller.deassign_user_perms(oid, data.get("perms"))
+        return {"uuid": resp}, 200
 
 
 class GetRolePermsResponseSchema(ApiObjectResponseSchema):
@@ -116,21 +105,16 @@ class GetRolePermsResponseSchema(Schema):
 
 
 class GetRolePerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'GetRolePermsResponseSchema': GetRolePermsResponseSchema,
+        "GetRolePermsResponseSchema": GetRolePermsResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': GetRolePermsResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": GetRolePermsResponseSchema}})
 
     def get(self, controller, data, oid, *args, **kwargs):
         perms = controller.get_role_perms(oid)
-        return {'perms': perms}
+        return {"perms": perms}
 
 
 class SetRolePermRequestSchema(Schema):
@@ -143,27 +127,22 @@ class SetRolePermsRequestSchema(Schema):
 
 
 class SetRolePermsBodyRequestSchema(GetApiObjectRequestSchema):
-    body = fields.Nested(SetRolePermsRequestSchema, context='body')
+    body = fields.Nested(SetRolePermsRequestSchema, context="body")
 
 
 class SetRolePerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'SetRolePermsRequestSchema': SetRolePermsRequestSchema,
-        'CrudApiObjectSimpleResponseSchema': CrudApiObjectSimpleResponseSchema
+        "SetRolePermsRequestSchema": SetRolePermsRequestSchema,
+        "CrudApiObjectSimpleResponseSchema": CrudApiObjectSimpleResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(SetRolePermsBodyRequestSchema)
     parameters_schema = SetRolePermsRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': CrudApiObjectSimpleResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
     def post(self, controller, data, oid, *args, **kwargs):
-        resp = controller.assign_role_perms(oid, data.get('perms'))
-        return {'uuid': resp}, 200
+        resp = controller.assign_role_perms(oid, data.get("perms"))
+        return {"uuid": resp}, 200
 
 
 class UnSetRolePermRequestSchema(Schema):
@@ -176,47 +155,40 @@ class UnSetRolePermsRequestSchema(Schema):
 
 
 class UnSetRolePermsBodyRequestSchema(GetApiObjectRequestSchema):
-    body = fields.Nested(UnSetRolePermsRequestSchema, context='body')
+    body = fields.Nested(UnSetRolePermsRequestSchema, context="body")
 
 
 class UnSetRolePerms(SshApiView):
-    tags = ['ssh']
+    tags = ["ssh"]
     definitions = {
-        'UnSetRolePermsRequestSchema': UnSetRolePermsRequestSchema,
-        'CrudApiObjectSimpleResponseSchema': CrudApiObjectSimpleResponseSchema
+        "UnSetRolePermsRequestSchema": UnSetRolePermsRequestSchema,
+        "CrudApiObjectSimpleResponseSchema": CrudApiObjectSimpleResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(UnSetRolePermsBodyRequestSchema)
     parameters_schema = UnSetRolePermsRequestSchema
-    responses = SshApiView.setResponses({
-        200: {
-            'description': 'success',
-            'schema': CrudApiObjectSimpleResponseSchema
-        }
-    })
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
     def delete(self, controller, data, oid, *args, **kwargs):
-        resp = controller.deassign_role_perms(oid, data.get('perms'))
-        return {'uuid': resp}, 200
+        resp = controller.deassign_role_perms(oid, data.get("perms"))
+        return {"uuid": resp}, 200
 
 
 class SshPermAPI(ApiView):
-    """SshPermAPI
-    """
+    """SshPermAPI"""
+
     @staticmethod
     def register_api(module, **kwargs):
-        base = 'gas'
+        base = "gas"
         rules = [
-            ('%s/sshperms/<oid>' % base, 'GET', GetUserPerms, {}),
-            ('%s/sshperms/<oid>' % base, 'POST', SetUserPerms, {}),
-            ('%s/sshperms/<oid>' % base, 'DELETE', UnSetUserPerms, {}),
-
-            ('%s/perms/user/<oid>' % base, 'GET', GetUserPerms, {}),
-            ('%s/perms/user/<oid>' % base, 'POST', SetUserPerms, {}),
-            ('%s/perms/user/<oid>' % base, 'DELETE', UnSetUserPerms, {}),
-
-            ('%s/perms/role/<oid>' % base, 'GET', GetRolePerms, {}),
-            ('%s/perms/role/<oid>' % base, 'POST', SetRolePerms, {}),
-            ('%s/perms/role/<oid>' % base, 'DELETE', UnSetRolePerms, {}),
+            ("%s/sshperms/<oid>" % base, "GET", GetUserPerms, {}),
+            ("%s/sshperms/<oid>" % base, "POST", SetUserPerms, {}),
+            ("%s/sshperms/<oid>" % base, "DELETE", UnSetUserPerms, {}),
+            ("%s/perms/user/<oid>" % base, "GET", GetUserPerms, {}),
+            ("%s/perms/user/<oid>" % base, "POST", SetUserPerms, {}),
+            ("%s/perms/user/<oid>" % base, "DELETE", UnSetUserPerms, {}),
+            ("%s/perms/role/<oid>" % base, "GET", GetRolePerms, {}),
+            ("%s/perms/role/<oid>" % base, "POST", SetRolePerms, {}),
+            ("%s/perms/role/<oid>" % base, "DELETE", UnSetRolePerms, {}),
         ]
 
         ApiView.register_api(module, rules, **kwargs)
