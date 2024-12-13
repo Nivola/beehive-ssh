@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2023 CSI-Piemonte
+# (C) Copyright 2018-2024 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -15,6 +15,7 @@ from beehive.common.apimanager import (
 )
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
+from beehive_ssh.controller import SshController
 from beehive_ssh.views import (
     SshApiView,
     ApiBaseSshObjectCreateRequestSchema,
@@ -45,7 +46,7 @@ class ListSshUsers(SshApiView):
     parameters_schema = ListSshUsersRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ListSshUsersResponseSchema}})
 
-    def get(self, controller, data, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, *args, **kwargs):
         """
         List users
         Call this api to list all the existing users
@@ -72,7 +73,7 @@ class GetSshUser(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetSshUserResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         return {"user": user.detail()}
 
@@ -87,7 +88,7 @@ class GetSshUserPerms(SshApiView):
     parameters_schema = PaginatedRequestQuerySchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         res, total = user.authorization(**data)
         return self.format_paginated_response(res, "perms", total, **data)
@@ -107,7 +108,7 @@ class GetSshUserPwd(SshApiView):
     parameters_schema = GetApiObjectRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         res = user.get_password()
         return {"password": res}
@@ -139,7 +140,7 @@ class CreateSshUser(SshApiView):
     parameters_schema = CreateSshUserRequestSchema
     responses = SshApiView.setResponses({201: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def post(self, controller, data, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, *args, **kwargs):
         from beehive_ssh.controller import SshController
 
         sshController: SshController = controller
@@ -173,7 +174,7 @@ class UpdateSshUser(SshApiView):
     parameters_schema = UpdateSshUserRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def put(self, controller, data, oid, *args, **kwargs):
+    def put(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         data = data.get("user")
         self.logger.warn(data)
@@ -188,7 +189,7 @@ class DeleteSshUser(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({204: {"description": "no response"}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         self.logger.warn(user.name)
         resp = user.delete(soft=True)

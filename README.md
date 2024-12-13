@@ -1,5 +1,5 @@
 # beehive-ssh
-__beehive-ssh__ is the project that contains the ssh component of the nivola cmp platform. 
+__beehive-ssh__ is the project that contains the ssh component of the nivola cmp platform.
 
 Ssh component is used to manage virtual machine access and connection.
 
@@ -54,13 +54,12 @@ We use Semantic Versioning for versioning. (https://semver.org)
 See the list of contributors who participated in this project in the file AUTHORS.md contained in each specific project.
 
 ## Copyright
-CSI Piemonte - 2018-2022
+CSI Piemonte - 2018-2024
 
 Regione Piemonte - 2020-2022
 
 ## License
-See the *LICENSE.txt file contained in each specific project for details.
+See EUPL v1_2 EN-LICENSE.txt or EUPL v1_2 IT-LICENSE.txt file for details
 
 ## Community site (Optional)
 At https://www.nivolapiemonte.it/ could find all the informations about the project.
-

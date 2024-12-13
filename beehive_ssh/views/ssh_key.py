@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2023 CSI-Piemonte
+# (C) Copyright 2018-2024 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -18,9 +18,12 @@ from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
 from beehive_ssh.views import SshApiView, ApiBaseSshObjectCreateRequestSchema
 
+from beehive_ssh.controller import SshController
+
 
 class ListSshKeysRequestSchema(ApiObjectRequestFiltersSchema, PaginatedRequestQuerySchema):
     user_id = fields.String(required=False, context="query")
+    key_names = fields.String(required=False)
 
 
 class ListSshKeysParamsResponseSchema(ApiObjectResponseSchema):
@@ -43,7 +46,7 @@ class ListSshKeys(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ListSshKeysResponseSchema}})
     response_schema = ListSshKeysResponseSchema
 
-    def get(self, controller, data, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, *args, **kwargs):
         """
         List keys
         Call this api to list all the existing keys
@@ -60,6 +63,8 @@ class GetSshKeyParamsResponseSchema(ApiObjectResponseSchema):
     attribute = fields.String(required=False)
     version = fields.String(required=False)
     attributes = fields.Dict(required=False, default={}, example={})
+    type = fields.String(required=False)
+    bits = fields.Integer(required=False)
 
 
 class GetSshKeyResponseSchema(Schema):
@@ -75,7 +80,7 @@ class GetSshKey(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetSshKeyResponseSchema}})
     response_schema = GetSshKeyResponseSchema
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         from beehive_ssh.controller import SshController
 
         sshController: SshController = controller
@@ -94,7 +99,7 @@ class GetSshKeyPerms(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
     # response_schema = ApiObjectPermsResponseSchema
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         key = controller.get_ssh_key(oid)
         res, total = key.authorization(**data)
         return self.format_paginated_response(res, "perms", total, **data)
@@ -115,9 +120,9 @@ class CreateSshKeyParamRequestSchema(ApiBaseSshObjectCreateRequestSchema):
     )
     bits = fields.Integer(
         required=False,
-        missing=2048,
-        example=2096,
-        description="For new key specify bits like 2096. Use with type",
+        missing=4096,
+        example=4096,
+        description="For new key specify bits like 4096. Use with type",
     )
     attribute = fields.String(required=False)
 
@@ -141,7 +146,7 @@ class CreateSshKey(SshApiView):
     responses = SshApiView.setResponses({201: {"description": "success", "schema": CrudApiObjectResponseSchema}})
     response_schema = CrudApiObjectResponseSchema
 
-    def post(self, controller, data, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, *args, **kwargs):
         resp = controller.add_ssh_key(**data.get("key"))
         return {"uuid": resp}, 201
 
@@ -172,7 +177,7 @@ class UpdateSshKey(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
     # response_schema = CrudApiObjectResponseSchema
 
-    def put(self, controller, data, oid, *args, **kwargs):
+    def put(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         key = controller.get_ssh_key(oid)
         data = data.get("key")
         resp = key.update(**data)
@@ -186,7 +191,7 @@ class DeleteSshKey(SshApiView):
     responses = SshApiView.setResponses({204: {"description": "no response"}})
     # response_schema =
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         key = controller.get_ssh_key(oid)
         resp = key.delete(soft=True)
         return resp, 204
@@ -211,7 +216,7 @@ class GetKeyRoles(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
     # response_schema = ApiObjectPermsResponseSchema
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List key object permission
         Call this api to list object permissions
@@ -239,7 +244,7 @@ class GetKeyUsers(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
     # response_schema = ApiObjectPermsResponseSchema
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List key object permission
         Call this api to list object permissions
@@ -274,14 +279,14 @@ class SetKeyUsers(SshApiView):
     # resp: True
     # response_schema = CrudApiObjectSimpleResponseSchema
 
-    def post(self, controller, data, oid, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Set key user
         Set key user
         """
-        from beehive_ssh.controller import ApiSshKey
+        from beehive_ssh.controller import key
 
-        key: ApiSshKey = controller.get_ssh_key(oid)
+        key: key = controller.get_ssh_key(oid)
         data = data.get("user")
         resp = key.set_user(**data)
         return True, 200
@@ -311,7 +316,7 @@ class UnsetKeyUsers(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
     # response_schema = CrudApiObjectSimpleResponseSchema
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Unset key user
         Unset key user
@@ -340,7 +345,7 @@ class GetKeyGroups(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
     # response_schema = ApiObjectPermsResponseSchema
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List group object permission
         Call this api to list object permissions
@@ -374,7 +379,7 @@ class SetKeyGroups(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
     # response_schema = CrudApiObjectSimpleResponseSchema
 
-    def post(self, controller, data, oid, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Set group group
         Set group group
@@ -409,7 +414,7 @@ class UnsetKeyGroups(SshApiView):
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
     # response_schema = CrudApiObjectSimpleResponseSchema
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Unset group group
         Unset group group

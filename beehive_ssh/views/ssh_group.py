@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2023 CSI-Piemonte
+# (C) Copyright 2018-2024 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -17,6 +17,7 @@ from beehive.common.apimanager import (
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
 from beehive_ssh.views import SshApiView, ApiBaseSshObjectCreateRequestSchema
+from beehive_ssh.controller import SshController
 
 
 class GetSshGroupsParamsResponseSchema(ApiObjectResponseSchema):
@@ -35,7 +36,7 @@ class GetSshGroup(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetSshGroupResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         group = controller.get_ssh_group(oid)
         return {"group": group.detail()}
 
@@ -57,7 +58,7 @@ class ListSshGroups(SshApiView):
     parameters_schema = ListSshGroupsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ListSshGroupsResponseSchema}})
 
-    def get(self, controller, data, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, *args, **kwargs):
         """
         List groups
         Call this api to list all the existing groups
@@ -78,7 +79,7 @@ class GetSshGroupPerms(SshApiView):
     parameters_schema = PaginatedRequestQuerySchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         group = controller.get_ssh_group(oid)
         res, total = group.authorization(**data)
         return self.format_paginated_response(res, "perms", total, **data)
@@ -106,8 +107,8 @@ class CreateSshGroup(SshApiView):
     parameters_schema = CreateSshGroupRequestSchema
     responses = SshApiView.setResponses({201: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def post(self, controller, data, *args, **kwargs):
-        self.logger.warn(data)
+    def post(self, controller: SshController, data: dict, *args, **kwargs):
+        self.logger.warning(data)
         resp = controller.add_ssh_group(**data.get("group"))
         return ({"uuid": resp}, 201)
 
@@ -137,7 +138,7 @@ class UpdateSshGroup(SshApiView):
     parameters_schema = UpdateSshGroupRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def put(self, controller, data, oid, *args, **kwargs):
+    def put(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         group = controller.get_ssh_group(oid)
         data = data.get("group")
         resp = group.update(**data)
@@ -150,7 +151,7 @@ class DeleteSshGroup(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({204: {"description": "no response"}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         group = controller.get_ssh_group(oid)
         resp = group.delete(soft=True)
         # resp = controller.delete_group(group.model)
@@ -175,7 +176,7 @@ class AddSshGroupNode(SshApiView):
     parameters_schema = AddSshGroupNodeRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def put(self, controller, data, oid, *args, **kwargs):
+    def put(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         group = controller.get_ssh_group(oid)
         node = data.get("node")
         resp = group.add_node(node)
@@ -200,7 +201,7 @@ class DeleteSshGroupNode(SshApiView):
     parameters_schema = DeleteSshGroupNodeRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         group = controller.get_ssh_group(oid)
         node = data.get("node")
         resp = group.remove_node(node)
@@ -225,7 +226,7 @@ class GetGroupRoles(SshApiView):
     parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: str, data: dict, oid: str, *args, **kwargs):
         """
         List group object permission
         Call this api to list object permissions
@@ -252,7 +253,7 @@ class GetGroupUsers(SshApiView):
     parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List group object permission
         Call this api to list object permissions
@@ -285,7 +286,7 @@ class SetGroupUsers(SshApiView):
     parameters_schema = SetGroupUsersRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def post(self, controller, data, oid, *args, **kwargs):
+    def post(self, controller: SshController, data, oid, *args, **kwargs):
         """
         Set group user
         Set group user
@@ -347,12 +348,14 @@ class GetGroupGroups(SshApiView):
     parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data, oid, *args, **kwargs):
         """
         List group object permission
         Call this api to list object permissions
         """
-        group = controller.get_ssh_group(oid)
+        from beehive_ssh.controller import ApiSshGroup
+
+        group: ApiSshGroup = controller.get_ssh_group(oid)
         res = group.get_groups()
         return {"groups": res, "count": len(res)}
 
@@ -380,12 +383,14 @@ class SetGroupGroups(SshApiView):
     parameters_schema = SetGroupGroupsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def post(self, controller, data, oid, *args, **kwargs):
+    def post(self, controller: SshController, data, oid, *args, **kwargs):
         """
         Set group group
         Set group group
         """
-        group = controller.get_ssh_group(oid)
+        from beehive_ssh.controller import ApiSshGroup
+
+        group: ApiSshGroup = controller.get_ssh_group(oid)
         data = data.get("group")
         resp = group.set_group(**data)
         return True, 200
@@ -414,7 +419,7 @@ class UnsetGroupGroups(SshApiView):
     parameters_schema = UnsetGroupGroupsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data, oid, *args, **kwargs):
         """
         Unset group group
         Unset group group

@@ -1,0 +1,82 @@
+Changelog:
+  - version: 1.16.0
+    date: 2024-03-26
+    desc: rilascio correttive
+    fixed:
+      - type hint
+      - fix/nodeconnect
+      - update changelog
+      - update Authoes using  git shortlog
+      - headers updated
+      - fix call to get_ssh_users method  using node_id
+      - role connect for node
+      - some type hint
+      - Update manifest
+  - version: 1.15.0
+    date: 2025-10-12
+    descr: rilascio correttive
+    fixed:
+      - minor fixes
+  - version: 1.14.0
+    date: 2023-06-22
+    fixed:
+      - minor fixes
+  - version: 1.13.0
+    date: 2023-02-24
+    fixed:
+      - minor fixes
+  - version: 1.12.0
+    date: 2023-01-27
+    added:
+      - elasticsearch upgrade
+    fixed:
+      - validation methods response
+  - version: 1.11.0
+    date: 2022-10-11
+    fixed:
+      - deversi piccole fix
+  - version: 1.5.1
+    date: 2022-02-11
+    added:
+    fixed:
+      - correct bug in ssh user get. Some fields are not valorized
+      - correct bug in list ssh user by node. Read param node in place of node_id
+      - correct bug in node user auth. User assigned is wrong because user filter by node pass a wrong parameter
+  - version: 1.5.0
+    date: 2021-06-11
+    added:
+      - update node ssh dynamic ansible inventory
+    fixed:
+      - correct bug in ssh node update. Some fields are required
+  - version: 1.4.0
+    date: 2021-02-05
+    added:
+    fixed:
+      - add new api ping (with sql check), capabilities and version to /v1.0/gas
+  - version: 1.3.0
+    date: 2020-06-21
+    added:
+    fixed:
+      - porting of all code to python 3
+  - version: 1.2.0
+    date: 2019-09-04
+    descr:
+    added:
+      - ruolo master per chiavi ssh
+    changed:
+      - metodo putper chiavi ssh api per impostare name reference
+    fixed:
+      - modify add_ssh_user to manage user with key_oid=None
+  - version: 1.1.0
+    date: 2019-05-24
+    descr:
+    added:
+    fixed:
+    changed:
+      - increase to 200 size of the field name of the ssh node
+  - version: 1.0.0
+    date: 2018-07-31
+    descr: rilascio prima preview di produzione.
+  - version: 0.1.0
+    date: 2016-04-18
+    desc: rilascio poram preview.

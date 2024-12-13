@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2023 CSI-Piemonte
+# (C) Copyright 2018-2024 CSI-Piemonte
 
 from marshmallow.validate import OneOf
 
@@ -19,6 +19,7 @@ from beehive.common.apimanager import (
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
 from beehive_ssh.views import SshApiView, ApiBaseSshObjectCreateRequestSchema
+from beehive_ssh.controller import SshController, ApiSshNode
 
 
 class ListSshNodesRequestSchema(ApiObjectRequestFiltersSchema, PaginatedRequestQuerySchema):
@@ -48,7 +49,7 @@ class ListSshNodes(SshApiView):
     parameters_schema = ListSshNodesRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ListSshNodesResponseSchema}})
 
-    def get(self, controller, data, *args, **kwargs):
+    def get(self, controller: SshController, data, *args, **kwargs):
         """
         List nodes
         Call this api to list all the existing nodes
@@ -76,7 +77,7 @@ class GetSshNode(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetSshNodeResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid, *args, **kwargs):
         node = controller.get_ssh_node(oid)
         return {"node": node.detail()}
 
@@ -91,7 +92,7 @@ class GetSshNodePerms(SshApiView):
     parameters_schema = PaginatedRequestQuerySchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid, *args, **kwargs):
         node = controller.get_ssh_node(oid)
         res, total = node.authorization(**data)
         return self.format_paginated_response(res, "perms", total, **data)
@@ -122,7 +123,7 @@ class CreateSshNode(SshApiView):
     parameters_schema = CreateSshNodeRequestSchema
     responses = SshApiView.setResponses({201: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def post(self, controller, data, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, *args, **kwargs):
         resp = controller.add_ssh_node(**data.get("node"))
         return {"uuid": resp}, 201
 
@@ -154,7 +155,7 @@ class UpdateSshNode(SshApiView):
     parameters_schema = UpdateSshNodeRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectResponseSchema}})
 
-    def put(self, controller, data, oid, *args, **kwargs):
+    def put(self, controller: SshController, data: dict, oid, *args, **kwargs):
         node = controller.get_ssh_node(oid)
         data = data.get("node")
         resp = node.update(**data)
@@ -167,7 +168,7 @@ class DeleteSshNode(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({204: {"description": "no response"}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid, *args, **kwargs):
         node = controller.get_ssh_node(oid)
         resp = node.delete(soft=True)
         return resp, 204
@@ -199,7 +200,7 @@ class PutSshNodeAction(SshApiView):
     parameters_schema = ApiObjectActionRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectActionResponseSchema}})
 
-    def put(self, controller, data, oid, *args, **kwargs):
+    def put(self, controller: SshController, data: dict, oid, *args, **kwargs):
         action = data.get("action")
         action_id = data.get("action_id", None)
         params = data.get("params")
@@ -252,7 +253,7 @@ class GetSshNodeAction(SshApiView):
     parameters_schema = GetSshNodeActionRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetSshNodeActionResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         accesses, total = controller.get_ssh_node_actions(node_id=oid, **data)
         return self.format_paginated_response(accesses, "actions", total, **data)
 
@@ -275,7 +276,7 @@ class GetNodeRoles(SshApiView):
     parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List node object permission
         Call this api to list object permissions
@@ -302,7 +303,7 @@ class GetNodeUsers(SshApiView):
     parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List node object permission
         Call this api to list object permissions
@@ -335,12 +336,13 @@ class SetNodeUsers(SshApiView):
     parameters_schema = SetNodeUsersRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def post(self, controller, data, oid, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
-        Set node user
+        Set node user ad permission described by
         Set node user
         """
-        node = controller.get_ssh_node(oid)
+        # from beehive_ssh.controller import SshNode
+        node: ApiSshNode = controller.get_ssh_node(oid)
         data = data.get("user")
         resp = node.set_user(**data)
         return True, 200
@@ -369,7 +371,7 @@ class UnsetNodeUsers(SshApiView):
     parameters_schema = UnsetNodeUsersRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Unset node user
         Unset node user
@@ -397,7 +399,7 @@ class GetNodeGroups(SshApiView):
     parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
-    def get(self, controller, data, oid, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         List group object permission
         Call this api to list object permissions
@@ -430,7 +432,7 @@ class SetNodeGroups(SshApiView):
     parameters_schema = SetNodeGroupsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def post(self, controller, data, oid, *args, **kwargs):
+    def post(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Set group group
         Set group group
@@ -464,7 +466,7 @@ class UnsetNodeGroups(SshApiView):
     parameters_schema = UnsetNodeGroupsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": CrudApiObjectSimpleResponseSchema}})
 
-    def delete(self, controller, data, oid, *args, **kwargs):
+    def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         """
         Unset group group
         Unset group group

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2023 CSI-Piemonte
+# (C) Copyright 2018-2024 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -10,6 +10,7 @@ from beehive.common.apimanager import (
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
 from beehive_ssh.views import SshApiView
+from beehive_ssh.controller import SshController
 
 
 class GetInventoryRequestSchema(Schema):
@@ -63,7 +64,7 @@ class GetInventoryNode(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetInventoryNodeResponseSchema}})
 
-    def get(self, controller, data, node, *args, **kwargs):
+    def get(self, controller: SshController, data: dict, node: str, *args, **kwargs):
         res = controller.get_ansible_inventory(node=node)
         res = res.get("_meta").get("hostvars").get(node)
         return {"ansible": res}
