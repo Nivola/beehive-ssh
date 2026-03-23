@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from sqlalchemy.ext.declarative import declarative_base
 from beehive.common.model import BaseEntity
 import logging
 from sqlalchemy import Column, Integer, Text, Table, ForeignKey, String
-from sqlalchemy.orm import relationship, backref, relation
+from sqlalchemy.orm import relationship, backref
 
 Base = declarative_base()
 
@@ -17,7 +17,7 @@ class GroupNodes(Base):
     __tablename__ = "groups_nodes"
     __table_args__ = {"mysql_engine": "InnoDB"}
 
-    id = (Column("id", Integer, primary_key=True),)
+    id = Column("id", Integer, primary_key=True)
     fk_group_id = Column(Integer, ForeignKey("ssh_group.id"), primary_key=True)
     fk_node_id = Column(Integer, ForeignKey("ssh_node.id"), primary_key=True)
 
@@ -26,7 +26,7 @@ class KeyUsers(Base):
     __tablename__ = "keys_users"
     __table_args__ = {"mysql_engine": "InnoDB"}
 
-    id = (Column("id", Integer, primary_key=True),)
+    id = Column("id", Integer, primary_key=True)
     fk_key_id = Column(Integer, ForeignKey("ssh_key.id"), primary_key=True)
     fk_user_id = Column(Integer, ForeignKey("ssh_user.id"), primary_key=True)
 

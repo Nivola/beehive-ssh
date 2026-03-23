@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -21,7 +21,7 @@ from beehive_ssh.controller import SshController
 
 
 class GetSshGroupsParamsResponseSchema(ApiObjectResponseSchema):
-    attribute = fields.String(required=False, default="Public")
+    attribute = fields.String(required=False, dump_default="Public")
 
 
 class GetSshGroupResponseSchema(Schema):
@@ -159,7 +159,8 @@ class DeleteSshGroup(SshApiView):
 
 
 class AddSshGroupNodeRequestSchema(Schema):
-    node = fields.String(required=True, description="Node name, id or uuid")
+    node = fields.String(required=True,
+                         metadata={"description": "Node name, id or uuid"})
 
 
 class AddSshGroupNodeBodyRequestSchema(GetApiObjectRequestSchema):
@@ -184,7 +185,8 @@ class AddSshGroupNode(SshApiView):
 
 
 class DeleteSshGroupNodeRequestSchema(Schema):
-    node = fields.String(required=True, description="Node name, id or uuid")
+    node = fields.String(required=True,
+                         metadata={"description": "Node name, id or uuid"})
 
 
 class DeleteSshGroupNodeBodyRequestSchema(GetApiObjectRequestSchema):
@@ -209,8 +211,8 @@ class DeleteSshGroupNode(SshApiView):
 
 
 class GetGroupRolesItemResponseSchema(ApiObjectResponseSchema):
-    name = fields.String(required=True, default="master")
-    desc = fields.String(required=True, default="")
+    name = fields.String(required=True, dump_default="master")
+    desc = fields.String(required=True, dump_default="")
 
 
 class GetGroupRolesResponseSchema(Schema):
@@ -237,7 +239,7 @@ class GetGroupRoles(SshApiView):
 
 
 class GetGroupUsersItemResponseSchema(ApiObjectResponseSchema):
-    role = fields.String(required=True, default="master")
+    role = fields.String(required=True, dump_default="master")
 
 
 class GetGroupUsersResponseSchema(Schema):
@@ -264,8 +266,10 @@ class GetGroupUsers(SshApiView):
 
 
 class SetGroupUsersParamRequestSchema(Schema):
-    user_id = fields.String(required=False, default="prova", description="User name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    user_id = fields.String(required=False,
+                            metadata={"description": "User name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class SetGroupUsersRequestSchema(Schema):
@@ -298,8 +302,10 @@ class SetGroupUsers(SshApiView):
 
 
 class UnsetGroupUsersParamRequestSchema(Schema):
-    user_id = fields.String(required=False, default="prova", description="User name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    user_id = fields.String(required=False,
+                            metadata={"description": "User name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class UnsetGroupUsersRequestSchema(Schema):
@@ -332,7 +338,7 @@ class UnsetGroupUsers(SshApiView):
 
 
 class GetGroupGroupsItemResponseSchema(ApiObjectResponseSchema):
-    role = fields.String(required=True, default="master")
+    role = fields.String(required=True, dump_default="master")
 
 
 class GetGroupGroupsResponseSchema(Schema):
@@ -361,8 +367,10 @@ class GetGroupGroups(SshApiView):
 
 
 class SetGroupGroupsParamRequestSchema(Schema):
-    group_id = fields.String(required=False, default="prova", description="Group name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    group_id = fields.String(required=False,
+                             metadata={"description": "Group name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class SetGroupGroupsRequestSchema(Schema):
@@ -397,8 +405,10 @@ class SetGroupGroups(SshApiView):
 
 
 class UnsetGroupGroupsParamRequestSchema(Schema):
-    group_id = fields.String(required=False, default="prova", description="Group name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    group_id = fields.String(required=False,
+                             metadata={"description": "Group name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class UnsetGroupGroupsRequestSchema(Schema):

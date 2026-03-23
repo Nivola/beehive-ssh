@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 from re import match
-
+from typing import List
 from beecell.db import ModelError
 from beecell.simple import truncate
 from beehive.common.model import AbstractDbManager, PaginatedQueryGenerator
@@ -28,6 +28,7 @@ from datetime import datetime
 sshBase = Base
 logger = logging.getLogger(__name__)
 
+ADMINISTRATIVE_USER_NAMES = ["root", "centos", "administrator", "ubuntu"]
 
 class SshDbManager(AbstractDbManager):
     """Ssh db manager
@@ -312,10 +313,10 @@ class SshDbManager(AbstractDbManager):
             if match("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", user_id):
                 filters.append("AND t3.uuid= :user_id")
             # get obj by id
-            elif match("^\d+$", user_id):
+            elif match(r"^\d+$", user_id):
                 filters.append("AND t3.id= :user_id")
             # get obj by name
-            elif match("[\-\w\d]+", user_id):
+            elif match(r"[\-\w\d]+", user_id):
                 filters.append("AND t3.name= :user_id")
 
         if username is not None:
@@ -378,7 +379,7 @@ class SshDbManager(AbstractDbManager):
         res, total = self.get_paginated_entities(entity, filters=filters, *args, **kvargs)
         return res, total
 
-    def get_nodes_and_groups(self, users=["root", "centos", "administrator"], group=None, node=None, node_name=None):
+    def get_nodes_and_groups(self, users: List[str]=None, group=None, node=None, node_name=None):
         """Get nodes and groups
 
         :param users: list of user for nodes
@@ -387,6 +388,8 @@ class SshDbManager(AbstractDbManager):
         :param node_name: node name pattern [optional]
         :return:
         """
+        if not users:
+            users = ADMINISTRATIVE_USER_NAMES
         session = self.get_session()
         data = (
             session.query(SshNode, SshUser, SshKey, SshGroup)

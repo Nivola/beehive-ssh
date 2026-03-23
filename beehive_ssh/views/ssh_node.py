@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from marshmallow.validate import OneOf
 
@@ -131,7 +131,7 @@ class CreateSshNode(SshApiView):
 class UpdateSshNodeParamRequestSchema(Schema):
     name = fields.String(required=False)
     desc = fields.String(required=False)
-    active = fields.Boolean(required=False, default=False)
+    active = fields.Boolean(required=False)
     ip_address = fields.String(required=False)
     node_type = fields.String(required=False)
     attribute = fields.String(required=False)
@@ -177,8 +177,8 @@ class DeleteSshNode(SshApiView):
 class ApiObjectActionRequestSchema(Schema):
     action = fields.String(required=True)
     action_id = fields.String(required=False)
-    status = fields.String(required=False, missing=None)
-    params = fields.Dict(default={}, required=True)
+    status = fields.String(required=False, load_default=None)
+    params = fields.Dict(required=True)
 
 
 class ApiObjectActionBodyRequestSchema(Schema):
@@ -211,8 +211,10 @@ class PutSshNodeAction(SshApiView):
 
 
 class GetSshNodeActionParamsResponseSchema(PaginatedResponseSchema):
-    id = fields.Integer(required=True, example=10, description="Cmp user that made action")
-    date = fields.DateTime(required=True, example="1990-12-31T23:59:59Z", description="Action time")
+    id = fields.Integer(required=True,
+                        metadata={"example": 10, "description": "Cmp user that made action"})
+    date = fields.DateTime(required=True,
+                           metadata={"example": "1990-12-31T23:59:59Z", "description": "Action time"})
     user_id = fields.Dict(
         required=True,
         example={
@@ -222,17 +224,23 @@ class GetSshNodeActionParamsResponseSchema(PaginatedResponseSchema):
         },
         description="Cmp user that made action",
     )
-    action_id = fields.String(required=True, example="test", description="Action id")
-    action = fields.String(required=True, example="test", description="Action name")
-    elapsed = fields.String(required=True, example="test", description="Action elapsed time")
-    node_id = fields.String(required=True, example="test", description="Node id")
-    node_name = fields.String(required=True, example="test", description="Node name")
+    action_id = fields.String(required=True,
+                              metadata={"example": "test", "description": "Action id"})
+    action = fields.String(required=True,
+                           metadata={"example": "test", "description": "Action name"})
+    elapsed = fields.String(required=True,
+                            metadata={"example": "test", "description": "Action elapsed time"})
+    node_id = fields.String(required=True,
+                            metadata={"example": "test", "description": "Node id"})
+    node_name = fields.String(required=True,
+                              metadata={"example": "test", "description": "Node name"})
     node_user = fields.Dict(
         required=True,
-        example={"name": "root", "key": "19aa137b-3b3e-479c-9030-798325ddee70"},
+        example={"name": "root", "key": "<key>"},
         description="Node user",
     )
-    status = fields.String(required=True, example="OK", description="Action status")
+    status = fields.String(required=True,
+                           metadata={"example": "OK", "description": "Action status"})
 
 
 class GetSshNodeActionResponseSchema(Schema):
@@ -240,7 +248,8 @@ class GetSshNodeActionResponseSchema(Schema):
 
 
 class GetSshNodeActionRequestSchema(PaginatedRequestQuerySchema, GetApiObjectRequestSchema):
-    date = fields.String(default="1985.04.12", context="query", description="query date")
+    date = fields.String(load_default="1985.04.12", context="query",
+                         metadata={"description": "query date"})
 
 
 class GetSshNodeAction(SshApiView):
@@ -259,8 +268,8 @@ class GetSshNodeAction(SshApiView):
 
 
 class GetNodeRolesItemResponseSchema(ApiObjectResponseSchema):
-    name = fields.String(required=True, default="master")
-    desc = fields.String(required=True, default="")
+    name = fields.String(required=True, dump_default="master")
+    desc = fields.String(required=True, dump_default="")
 
 
 class GetNodeRolesResponseSchema(Schema):
@@ -287,7 +296,7 @@ class GetNodeRoles(SshApiView):
 
 
 class GetNodeUsersItemResponseSchema(ApiObjectResponseSchema):
-    role = fields.String(required=True, default="master")
+    role = fields.String(required=True, dump_default="master")
 
 
 class GetNodeUsersResponseSchema(Schema):
@@ -314,8 +323,10 @@ class GetNodeUsers(SshApiView):
 
 
 class SetNodeUsersParamRequestSchema(Schema):
-    user_id = fields.String(required=False, default="prova", description="User name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    user_id = fields.String(required=False,
+                            metadata={"description": "User name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class SetNodeUsersRequestSchema(Schema):
@@ -349,8 +360,10 @@ class SetNodeUsers(SshApiView):
 
 
 class UnsetNodeUsersParamRequestSchema(Schema):
-    user_id = fields.String(required=False, default="prova", description="User name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    user_id = fields.String(required=False,
+                            metadata={"description": "User name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class UnsetNodeUsersRequestSchema(Schema):
@@ -383,7 +396,7 @@ class UnsetNodeUsers(SshApiView):
 
 
 class GetNodeGroupsItemResponseSchema(ApiObjectResponseSchema):
-    role = fields.String(required=True, default="master")
+    role = fields.String(required=True, dump_default="master")
 
 
 class GetNodeGroupsResponseSchema(Schema):
@@ -410,8 +423,10 @@ class GetNodeGroups(SshApiView):
 
 
 class SetNodeGroupsParamRequestSchema(Schema):
-    group_id = fields.String(required=False, default="prova", description="Node name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    group_id = fields.String(required=False,
+                             metadata={"description": "Node name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class SetNodeGroupsRequestSchema(Schema):
@@ -444,8 +459,10 @@ class SetNodeGroups(SshApiView):
 
 
 class UnsetNodeGroupsParamRequestSchema(Schema):
-    group_id = fields.String(required=False, default="prova", description="Group name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    group_id = fields.String(required=False,
+                             metadata={"description": "Group name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class UnsetNodeGroupsRequestSchema(Schema):

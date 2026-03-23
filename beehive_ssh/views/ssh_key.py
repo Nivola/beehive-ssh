@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -23,17 +23,30 @@ from beehive_ssh.controller import SshController
 
 class ListSshKeysRequestSchema(ApiObjectRequestFiltersSchema, PaginatedRequestQuerySchema):
     user_id = fields.String(required=False, context="query")
-    key_names = fields.String(required=False)
+    key_names = fields.String(required=False, context="query")
 
 
-class ListSshKeysParamsResponseSchema(ApiObjectResponseSchema):
-    attribute = fields.String(required=False)
+# class ListSshKeysParamsResponseSchema(ApiObjectResponseSchema):
+#     attribute = fields.String(required=False)
+#     attributes = fields.Dict(required=False)
+#     priv_key = fields.String(required=True)
+#     pub_key = fields.String(required=True)
+#     version= fields.String(required=False)
+#     type= fields.String(required=False)
+#     bits= fields.Number(required=False)
+
+
+class GetSshKeyParamsResponseSchema(ApiObjectResponseSchema):
     priv_key = fields.String(required=True)
     pub_key = fields.String(required=True)
-
+    attribute = fields.String(required=False)
+    version = fields.String(required=False)
+    attributes = fields.Dict(required=False, dump_default={}, example={})
+    type = fields.String(required=False)
+    bits = fields.Integer(required=False)
 
 class ListSshKeysResponseSchema(PaginatedResponseSchema):
-    keys = fields.Nested(ListSshKeysParamsResponseSchema, many=True, required=True, allow_none=True)
+    keys = fields.Nested(GetSshKeyParamsResponseSchema, many=True, required=True, allow_none=True)
 
 
 class ListSshKeys(SshApiView):
@@ -57,14 +70,6 @@ class ListSshKeys(SshApiView):
         return self.format_paginated_response(res, "keys", total, **data)
 
 
-class GetSshKeyParamsResponseSchema(ApiObjectResponseSchema):
-    priv_key = fields.String(required=True)
-    pub_key = fields.String(required=True)
-    attribute = fields.String(required=False)
-    version = fields.String(required=False)
-    attributes = fields.Dict(required=False, default={}, example={})
-    type = fields.String(required=False)
-    bits = fields.Integer(required=False)
 
 
 class GetSshKeyResponseSchema(Schema):
@@ -106,21 +111,22 @@ class GetSshKeyPerms(SshApiView):
 
 
 class CreateSshKeyParamRequestSchema(ApiBaseSshObjectCreateRequestSchema):
-    priv_key = fields.String(required=False, missing=None, description="Private key. Use for existing key")
+    priv_key = fields.String(required=False, load_default=None,
+                             metadata={"description": "Private key. Use for existing key"})
     pub_key = fields.String(
         required=False,
-        missing=None,
+        load_default=None,
         description="Public key. Use with priv_key for existing key",
     )
     type = fields.String(
         required=False,
-        missing="rsa",
+        load_default="rsa",
         example="rsa",
         description="Specify type like rsa, dsa. Use for new key when priv_key is null",
     )
     bits = fields.Integer(
         required=False,
-        missing=4096,
+        load_default=4096,
         example=4096,
         description="For new key specify bits like 4096. Use with type",
     )
@@ -154,8 +160,9 @@ class CreateSshKey(SshApiView):
 class UpdateSshKeyParamRequestSchema(ApiBaseSshObjectCreateRequestSchema):
     priv_key = fields.String(required=False)
     pub_key = fields.String(required=False)
-    active = fields.Boolean(required=False, default=False)
-    openstack_key = fields.String(required=False, description="Openstack key name")
+    active = fields.Boolean(required=False)
+    openstack_key = fields.String(required=False,
+                                  metadata={"description": "Openstack key name"})
 
 
 class UpdateSshKeyRequestSchema(Schema):
@@ -198,8 +205,8 @@ class DeleteSshKey(SshApiView):
 
 
 class GetKeyRolesItemResponseSchema(ApiObjectResponseSchema):
-    name = fields.String(required=True, default="master")
-    desc = fields.String(required=True, default="")
+    name = fields.String(required=True, dump_default="master")
+    desc = fields.String(required=True, dump_default="")
 
 
 class GetKeyRolesResponseSchema(Schema):
@@ -227,7 +234,7 @@ class GetKeyRoles(SshApiView):
 
 
 class GetKeyUsersItemResponseSchema(ApiObjectResponseSchema):
-    role = fields.String(required=True, default="master")
+    role = fields.String(required=True, dump_default="master")
 
 
 class GetKeyUsersResponseSchema(Schema):
@@ -255,8 +262,10 @@ class GetKeyUsers(SshApiView):
 
 
 class SetKeyUsersParamRequestSchema(Schema):
-    user_id = fields.String(required=False, default="prova", description="User name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    user_id = fields.String(required=False,
+                            metadata={"description": "User name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class SetKeyUsersRequestSchema(Schema):
@@ -284,17 +293,18 @@ class SetKeyUsers(SshApiView):
         Set key user
         Set key user
         """
-        from beehive_ssh.controller import key
 
-        key: key = controller.get_ssh_key(oid)
+        key = controller.get_ssh_key(oid)
         data = data.get("user")
         resp = key.set_user(**data)
         return True, 200
 
 
 class UnsetKeyUsersParamRequestSchema(Schema):
-    user_id = fields.String(required=False, default="prova", description="User name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    user_id = fields.String(required=False,
+                            metadata={"description": "User name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class UnsetKeyUsersRequestSchema(Schema):
@@ -328,7 +338,7 @@ class UnsetKeyUsers(SshApiView):
 
 
 class GetKeyGroupsItemResponseSchema(ApiObjectResponseSchema):
-    role = fields.String(required=True, default="master")
+    role = fields.String(required=True, dump_default="master")
 
 
 class GetKeyGroupsResponseSchema(Schema):
@@ -356,8 +366,10 @@ class GetKeyGroups(SshApiView):
 
 
 class SetKeyGroupsParamRequestSchema(Schema):
-    group_id = fields.String(required=False, default="prova", description="Key name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    group_id = fields.String(required=False,
+                             metadata={"description": "Key name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class SetKeyGroupsRequestSchema(Schema):
@@ -391,8 +403,10 @@ class SetKeyGroups(SshApiView):
 
 
 class UnsetKeyGroupsParamRequestSchema(Schema):
-    group_id = fields.String(required=False, default="prova", description="Group name, id or uuid")
-    role = fields.String(required=False, default="prova", description="Role name, id or uuid")
+    group_id = fields.String(required=False,
+                             metadata={"description": "Group name, id or uuid"})
+    role = fields.String(required=False,
+                         metadata={"description": "Role name, id or uuid"})
 
 
 class UnsetKeyGroupsRequestSchema(Schema):

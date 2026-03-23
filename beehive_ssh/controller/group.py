@@ -1,12 +1,10 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 # from copy import deepcopy
 # from typing import List
 # from base64 import b64encode
-# from six.moves.urllib.parse import urlencode
-# from six import StringIO, ensure_binary
 # import ujson as json
 from typing import Tuple, List, Union
 
@@ -19,7 +17,6 @@ from beehive.common.data import trace, TransactionError
 # from beecell.types.type_dict import dict_get
 # from beecell.types.type_id import id_gen
 # from beecell.types.type_string import truncate
-# from paramiko import DSSKey, ECDSAKey, RSAKey
 # from paramiko.ssh_exception import SSHException
 # from beehive_ssh.dao.SshDao import SshDbManager
 # from beehive_ssh.model import SshGroup, SshNode, SshUser, SshKey

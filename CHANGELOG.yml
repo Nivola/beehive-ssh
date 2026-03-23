@@ -1,4 +1,75 @@
 Changelog:
+  - version: 1.18.2
+    date: 2026-03-12
+    added: []
+    fixed: []
+  - version: 1.18.1
+    date: 2026-02-12
+    added: 
+        - Update requirements
+    fixed: []
+
+  - version: 1.18.0
+    date: 2026-01-22
+    added: []
+    fixed:
+      - updated python version, labraries and dependencies
+      - schema definitions
+    removed:
+      - unused files
+      - six direct usage
+
+  - version: 1.17.13
+    date: 2025-12-11
+    added: []
+    fixed:
+      - bugfix inexistent unused import
+
+  - version: 1.17.12
+    date: 2025-11-27
+    added: []
+    fixed: []
+
+  - version: 1.17.11
+    date: 2025-11-06
+    added: []
+    fixed: []
+
+  - version: 1.17.7
+    date: 2025-08-05
+    added:
+      - SecurityGroup rule apply to NSX security group not to NSX distribuited firewall
+
+  - version: 1.17.4
+    date: 2025-04-17
+
+  - version: 1.17.3
+    date: 2025-03-28
+    fixed:
+      - inventory generation
+      - result schemas
+      - type hints and add common ssh connection params to ansible inventory export
+      - ssh get_nodes_and_groups macchine con utente ubuntu
+
+  - version: 1.17.2
+    date: 2025-03-12
+
+  - version: 1.17.1
+    date: 2025-03-6
+
+  - version: 1.17.0
+    date: 2025-02-24
+    desc: rilascio funzionalità
+    added:
+      - add key names to list ssh nodes
+      - Add algorithm key info to ssh key
+      - type hints
+    fixed:
+      - minor
+      - openapi schema definition
+      - default rsa ssh key length
+    removed:
+
   - version: 1.16.0
     date: 2024-03-26
     desc: rilascio correttive

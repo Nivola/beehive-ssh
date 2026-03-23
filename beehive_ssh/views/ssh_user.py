@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from beehive.common.apimanager import (
     ApiView,
@@ -85,7 +85,7 @@ class GetSshUserPerms(SshApiView):
         "ApiObjectPermsResponseSchema": ApiObjectPermsResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(ApiObjectPermsRequestSchema)
-    parameters_schema = PaginatedRequestQuerySchema
+    parameters_schema = ApiObjectPermsRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
 
     def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
@@ -94,19 +94,20 @@ class GetSshUserPerms(SshApiView):
         return self.format_paginated_response(res, "perms", total, **data)
 
 
-class ApiObjectPermsResponseSchema(Schema):
-    password = fields.String(required=True, default="mypass", example="mypass", description="USer password")
+class UserPasswordResponseSchema(Schema):
+    password = fields.String(required=True, dump_default="mypass",
+                             metadata={"example": "mypass", "description": "User password"})
 
 
 class GetSshUserPwd(SshApiView):
     tags = ["ssh"]
     definitions = {
         "GetApiObjectRequestSchema": GetApiObjectRequestSchema,
-        "ApiObjectPermsResponseSchema": ApiObjectPermsResponseSchema,
+        "UserPasswordResponseSchema": UserPasswordResponseSchema,
     }
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     parameters_schema = GetApiObjectRequestSchema
-    responses = SshApiView.setResponses({200: {"description": "success", "schema": ApiObjectPermsResponseSchema}})
+    responses = SshApiView.setResponses({200: {"description": "success", "schema": UserPasswordResponseSchema}})
 
     def get(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
@@ -177,8 +178,8 @@ class UpdateSshUser(SshApiView):
     def put(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
         data = data.get("user")
-        self.logger.warn(data)
-        self.logger.warn(user.name)
+        self.logger.warning(data)
+        self.logger.warning(user.name)
         resp = user.update(**data)
         return {"uuid": resp}, 200
 
@@ -191,7 +192,7 @@ class DeleteSshUser(SshApiView):
 
     def delete(self, controller: SshController, data: dict, oid: str, *args, **kwargs):
         user = controller.get_ssh_user(oid)
-        self.logger.warn(user.name)
+        self.logger.warning(user.name)
         resp = user.delete(soft=True)
         return resp, 204
 

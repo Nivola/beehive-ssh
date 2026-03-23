@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
+from typing import TYPE_CHECKING
 from beehive.common.apimanager import (
     ApiView,
     ApiObjectResponseSchema,
@@ -10,17 +11,30 @@ from beehive.common.apimanager import (
 from flasgger import fields, Schema
 from beecell.swagger import SwaggerHelper
 from beehive_ssh.views import SshApiView
-from beehive_ssh.controller import SshController
-
+if TYPE_CHECKING:
+    from beehive_ssh.controller import SshController
 
 class GetInventoryRequestSchema(Schema):
-    group = fields.String(required=False, example="Prova", allow_none=True, description="Group id or name")
-    node = fields.String(required=False, example="Prova", allow_none=True, description="Node id or name")
+    group = fields.String(
+        required=False,
+        example="Prova",
+        allow_none=True,
+        description="Group id or name",
+        context="query"
+    )
+    node = fields.String(
+        required=False,
+        example="Prova",
+        allow_none=True,
+        description="Node id or name",
+        context="query"
+    )
     node_name = fields.String(
         required=False,
         example="Prova",
         allow_none=True,
         description="Node name pattern",
+        context="query"
     )
 
 
@@ -37,7 +51,7 @@ class GetInventory(SshApiView):
     parameters_schema = GetInventoryRequestSchema
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetInventoryResponseSchema}})
 
-    def get(self, controller, data, *args, **kwargs):
+    def get(self, controller: 'SshController', data, *args, **kwargs):
         """
         Return a dynamic ansible inventory
         Return a dynamic ansible inventory
@@ -64,7 +78,7 @@ class GetInventoryNode(SshApiView):
     parameters = SwaggerHelper().get_parameters(GetApiObjectRequestSchema)
     responses = SshApiView.setResponses({200: {"description": "success", "schema": GetInventoryNodeResponseSchema}})
 
-    def get(self, controller: SshController, data: dict, node: str, *args, **kwargs):
+    def get(self, controller: 'SshController', data: dict, node: str, *args, **kwargs):
         res = controller.get_ansible_inventory(node=node)
         res = res.get("_meta").get("hostvars").get(node)
         return {"ansible": res}

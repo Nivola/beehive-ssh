@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from copy import deepcopy
 from typing import List
 from base64 import b64encode
-from six.moves.urllib.parse import urlencode
-from six import StringIO, ensure_binary
+from urllib.parse import urlencode
+from io import StringIO
+from beecell.util import ensure_binary
 import ujson as json
 from typing import Tuple, List, Union
 from beehive.common.apiclient import BeehiveApiClientError
@@ -16,7 +17,7 @@ from beehive.common.data import trace, TransactionError, operation
 from beecell.types.type_dict import dict_get
 from beecell.types.type_id import id_gen
 from beecell.types.type_string import truncate
-from paramiko import DSSKey, ECDSAKey, RSAKey
+from paramiko import ECDSAKey, RSAKey
 from paramiko.ssh_exception import SSHException
 from beehive_ssh.dao.SshDao import SshDbManager
 from beehive_ssh.model import SshGroup, SshNode, SshUser, SshKey
@@ -31,6 +32,7 @@ class SshController(ApiController):
     """Service Module controller."""
 
     version = "v1.0"
+    manager: SshDbManager
 
     def __init__(self, module):
         ApiController.__init__(self, module)
@@ -116,13 +118,27 @@ class SshController(ApiController):
             except:
                 inventory_dict[group.name] = {"hosts": [node.name]}
 
-            vars = {
+            ansible_hostvars = {
                 "ansible_user": user.username,
                 "ansible_password": self.decrypt_data(user.password),
             }
             if key is not None:
-                vars["ansible_user_key_uuid"] = key.uuid
-            inventory_dict["_meta"]["hostvars"][node.name] = vars
+                ansible_hostvars["ansible_user_key_uuid"] = key.uuid
+
+            # TODO improve logic
+            if user.username.lower() == 'administrator':
+                # windows
+                ansible_hostvars['ansible_connection'] = 'winrm'
+                ansible_hostvars['ansible_winrm_server_cert_validation'] = 'ignore'
+                ansible_hostvars['ansible_shell_type'] = 'powershell'
+                ansible_hostvars['ansible_python_interpreter'] = 'auto_silent'
+            else:
+                ansible_hostvars['ansible_ssh_common_args'] ='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+                ansible_hostvars['ansible_connection'] = 'ssh'
+                if user.username.lower() == 'ubuntu':
+                    ansible_hostvars['ansible_become'] = True
+
+            inventory_dict["_meta"]["hostvars"][node.name] = ansible_hostvars
             # inventory_dict['all']['vars']['ansible_ssh_private_key_files'][key.name] = key.priv_key
 
         return inventory_dict
@@ -477,7 +493,7 @@ class SshController(ApiController):
             objid = "%s" % (id_gen())
             if priv_key is None:
                 # create new priv e pub key
-                key_dispatch_table = {"dsa": DSSKey, "rsa": RSAKey, "ECDSA": ECDSAKey}
+                key_dispatch_table = {"rsa": RSAKey, "ECDSA": ECDSAKey}
 
                 if type not in key_dispatch_table:
                     raise SSHException("Unknown %s algorithm to generate keys pair" % type)

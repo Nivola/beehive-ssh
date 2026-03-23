@@ -1,22 +1,23 @@
 # SPDX-License-Identifier: EUPL-1.2
 #
-# (C) Copyright 2018-2024 CSI-Piemonte
+# (C) Copyright 2018-2026 CSI-Piemonte
 
 from copy import deepcopy
 from typing import List
 from base64 import b64encode
-from six.moves.urllib.parse import urlencode
-from six import StringIO, ensure_binary
+from urllib.parse import urlencode
+# from io import StringIO
+# from beecell.util import StringIO
 import ujson as json
 from typing import Tuple, List, Union
 from beehive.common.apiclient import BeehiveApiClientError
 from beehive.common.apimanager import ApiObject, ApiController, ApiManagerError
-from beehive.common.event import Event
+from beehive.common.event import Event, EventProducerKombu
 from beehive.common.data import trace, TransactionError, operation
 from beecell.types.type_dict import dict_get
 from beecell.types.type_id import id_gen
 from beecell.types.type_string import truncate
-from paramiko import DSSKey, ECDSAKey, RSAKey
+from paramiko import ECDSAKey, RSAKey
 from paramiko.ssh_exception import SSHException
 from beehive_ssh.dao.SshDao import SshDbManager
 from beehive_ssh.model import SshGroup, SshNode, SshUser, SshKey
@@ -226,7 +227,7 @@ class ApiSshNode(SshApiObject):
 
         # send event
         try:
-            client = self.controller.module.api_manager.event_producer
+            client: EventProducerKombu = self.controller.module.api_manager.event_producer
             client.send(self.SSH_OPERATION, data, source, dest)
             self.logger.debug("Send ssh node %s action %s event: %s" % (self.uuid, action, action_id))
         except Exception as ex:
